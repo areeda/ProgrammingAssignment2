@@ -64,7 +64,21 @@ test <- function(n=100, ...)
 
     # show timing difference
     speedup = as.numeric(nocache.time) / as.numeric(cache.time)
-    sprintf("no cache: %.5f sec, cache: %.5f, speed up: %.1fX",
-            nocache.time, cache.time, speedup)
-
+    print(sprintf("no cache: %.5f sec, cache: %.5f, speed up: %.1fX",
+            nocache.time, cache.time, speedup))
+    c <- a %*% b
+    tol <- 1e-9
+    err <- 0
+    for(i in 1:n)
+    {
+        for(j in 1:n)
+    {
+        s <- c[i,j]
+            if (i != j && abs(s) > tol)
+                err <- err + 1
+            else if (i == j && abs(s-1) > tol)
+                err <- err + 1
+        }
+    }
+    sprintf("Error count: %d", err)
 }
