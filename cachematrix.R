@@ -1,12 +1,22 @@
 ## Put comments here that give an overall description of what your
 ## functions do
 
-## makeCacheMatrix is a support function that returns a list of functions to
+## makeCacheMatrix is a support function that creates a cache for a Matrix
+# and its inverse.  It returns a list of functions to
 # support matrix inversion by caching the previous matrix and its inverse
 # thus if called twice with the same matrix it will quickly return the
 # previous calculation
 
-makeCacheMatrix <- function(m = matrix())
+# usage:  fnList <- makeCacheMatrix()
+# NB: create a different function list for each matrix you wish to cache
+# The returned list of functions:
+# fnList$set(m):  sets the input matrix to m and clear the stored inverse
+# fnList$get(): returns the input matrix
+# fnList$setinverse(m): cache the inverse
+# fnList$getinverse(m): return the cached inverse
+
+
+makeCacheMatrix <- function()
 {
     inputMatrix <- NULL
     set <- function(m)
@@ -15,7 +25,7 @@ makeCacheMatrix <- function(m = matrix())
         inverseMatrix <<- NULL
     }
     get <- function() inputMatrix
-    setinverse <- function(solve) inverseMatrix <<- solve
+    setinverse <- function(inv) inverseMatrix <<- inv
     getinverse <- function() inverseMatrix
     list(set = set, get = get,
          setinverse = setinverse,
@@ -23,6 +33,12 @@ makeCacheMatrix <- function(m = matrix())
 }
 
 ## Find the inverse of the matrix in the cache
+# Given an invertable matrix A find and cache the inverse by:
+# fnList <- makeCacheMatrix() # create the cache, save function list
+# fnList$set(A) # save input matrix
+# B <- cacheSolve(A) # calculate the inverse
+## subsequent calls to cacheSolve will return the cached results if
+# fnList$set() has not been called again
 
 cacheSolve <- function(x, ...)
 {
@@ -64,21 +80,12 @@ test <- function(n=100, ...)
 
     # show timing difference
     speedup = as.numeric(nocache.time) / as.numeric(cache.time)
-    print(sprintf("no cache: %.5f sec, cache: %.5f, speed up: %.1fX",
-            nocache.time, cache.time, speedup))
+    print(sprintf("For %dx%d. Without cache: %.5f sec, cache: %.5f, speed up: %.1fX",
+            n,n,nocache.time, cache.time, speedup))
     c <- a %*% b
-    tol <- 1e-9
-    err <- 0
-    for(i in 1:n)
+    I <- diag(n)
+    if (!isTRUE(all.equal(I, c)))
     {
-        for(j in 1:n)
-    {
-        s <- c[i,j]
-            if (i != j && abs(s) > tol)
-                err <- err + 1
-            else if (i == j && abs(s-1) > tol)
-                err <- err + 1
-        }
+        print("Error: result is not the inverse of input")
     }
-    sprintf("Error count: %d", err)
 }
