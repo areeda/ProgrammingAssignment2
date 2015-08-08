@@ -9,7 +9,7 @@
 makeCacheMatrix <- function(m = matrix())
 {
     inputMatrix <- NULL
-    set <- function(y)
+    set <- function(m)
     {
         inputMatrix <<- m
         inverseMatrix <<- NULL
@@ -22,7 +22,7 @@ makeCacheMatrix <- function(m = matrix())
          getinverse = getinverse)
 }
 
-## Write a short comment describing this function
+## Find the inverse of the matrix in the cache
 
 cacheSolve <- function(x, ...)
 {
@@ -34,6 +34,37 @@ cacheSolve <- function(x, ...)
     }
     data <- x$get()
     m <- solve(data, ...)
-    x$setsolve(m)
+    x$setinverse(m)
     m
+}
+
+# test the cache system
+test <- function(n=100, ...)
+{
+    # initialize the function list
+    fn.list <- makeCacheMatrix()
+
+    # get a test matrix
+    a <- matrix(rnorm(n*n), nrow=n)
+
+    # set the matrix in the cache manager
+    fn.list$set(a)
+
+    # get the inverse, timing it
+    start.time <- Sys.time();
+    b=cacheSolve(fn.list)
+    end.time <- Sys.time()
+    nocache.time <- end.time - start.time
+
+    # now time it again, this time answer is in cache
+    start.time <- Sys.time();
+    b=cacheSolve(fn.list)
+    end.time <- Sys.time()
+    cache.time <- end.time - start.time
+
+    # show timing difference
+    speedup = as.numeric(nocache.time) / as.numeric(cache.time)
+    sprintf("no cache: %.5f sec, cache: %.5f, speed up: %.1fX",
+            nocache.time, cache.time, speedup)
+
 }
