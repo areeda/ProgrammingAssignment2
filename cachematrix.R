@@ -80,8 +80,9 @@ test <- function(n=100, ...)
 
     # show timing difference
     speedup = as.numeric(nocache.time) / as.numeric(cache.time)
-    print(sprintf("For %dx%d. Without cache: %.5f sec, cache: %.5f, speed up: %.1fX",
-            n,n,nocache.time, cache.time, speedup))
+    print(sprintf("For %dx%d. Without cache: %.5f %s, cache: %.5f %s, speed up: %.1fX",
+            n, n, nocache.time, units(nocache.time), cache.time, units(cache.time),
+            speedup))
     c <- a %*% b
     I <- diag(n)
     if (!isTRUE(all.equal(I, c)))
